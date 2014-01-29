@@ -48,12 +48,15 @@
 #include "ofxMPMParticle.h"
 #include "ofxMPMNode.h"
 #include "ofxMPMObstacle.h"
+#include "ofxMPMForce.h"
+
+#include <vector.h>
 
 class ofxMPMFluid {
   public:
 	ofxMPMFluid();
 
-	void setup(int maxParticles, int w=160, int h=120);
+    void setup(int maxParticles, int w=160, int h=120);
 	void update(float mouseX = ofGetMouseX(), float mouseY = ofGetMouseY());
 	void draw();
     void addTouch(int userID, ofVec2f pos);
@@ -71,7 +74,7 @@ class ofxMPMFluid {
 	int getGridSizeX();
 	int getGridSizeY();
 	
-	float scaleFactor;	
+	ofVec2f scaleFactor;
 	int numParticles;
 	float densitySetting;
 	float stiffness;     
@@ -88,6 +91,8 @@ class ofxMPMFluid {
     float mouseForce;
 	
 	vector<ofxMPMParticle*>& getParticles();
+    
+    vector<ofxMPMForce*>* forces;
 	
   protected:
 	float elapsed;

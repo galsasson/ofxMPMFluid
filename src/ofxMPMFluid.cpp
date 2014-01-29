@@ -63,7 +63,7 @@ ofxMPMFluid::ofxMPMFluid()
     mouseForce(10),
 
 	elapsed(0.0),
-	scaleFactor(1.0),
+	scaleFactor(1.0, 1.0),
 	smoothing(1.0)
 {
 	//
@@ -89,10 +89,12 @@ void ofxMPMFluid::setup(int maxParticles, int w, int h){
 	for (int i=0; i < maxParticles; i++) {
 		int x0 = 5;
 		int x1 = gridSizeX-5;
-		float rx = ofRandom(x0,x1); 
-		float ry = ofRandom(5,gridSizeY-5);
-		particles.push_back( new ofxMPMParticle(rx,ry, 0.0, 0.0) );
+        float rx, ry;
+        rx = ofRandom(x0,x1);
+        ry = ofRandom(5,gridSizeY-5);
+		particles.push_back( new ofxMPMParticle(rx, ry, 0.0, 0.0) );
 	}
+    
 }
 
 void ofxMPMFluid::update(float mouseX, float mouseY){
@@ -455,10 +457,10 @@ void ofxMPMFluid::update(float mouseX, float mouseY){
 		p->v += gravity;
 		if (bDoMouse) {
             
-			float vx = abs(p->x - mouseX/scaleFactor);
-			float vy = abs(p->y - mouseY/scaleFactor);
-			float mdx = (mouseX - previousMouseX)/scaleFactor/2;
-			float mdy = (mouseY - previousMouseY)/scaleFactor/2;
+			float vx = abs(p->x - mouseX/scaleFactor.x);
+			float vy = abs(p->y - mouseY/scaleFactor.y);
+			float mdx = (mouseX - previousMouseX)/scaleFactor.x/2;
+			float mdy = (mouseY - previousMouseY)/scaleFactor.y/2;
 			if (vx < mouseForce && vy < mouseForce) {
 				float weight = (1.0F - vx / mouseForce) * (1.0F - vy / mouseForce);
 				p->u += weight * (mdx - p->u);
@@ -473,10 +475,10 @@ void ofxMPMFluid::update(float mouseX, float mouseY){
                 
                 for( int i =0; i<it->second.size()-1; i++){
                     
-                    float vx = abs(p->x - it->second[i +1].x/scaleFactor);
-                    float vy = abs(p->y - it->second[i +1].y/scaleFactor);
-                    float mdx = (it->second[i +1].x - it->second[i].x)/scaleFactor/2;
-                    float mdy = (it->second[i +1].y - it->second[i].y)/scaleFactor/2;
+                    float vx = abs(p->x - it->second[i +1].x/scaleFactor.x);
+                    float vy = abs(p->y - it->second[i +1].y/scaleFactor.y);
+                    float mdx = (it->second[i +1].x - it->second[i].x)/scaleFactor.x/2;
+                    float mdy = (it->second[i +1].y - it->second[i].y)/scaleFactor.y/2;
                     if (vx < mouseForce && vy < mouseForce) {
                         float weight = (1.0F - vx / mouseForce) * (1.0F - vy / mouseForce);
                         p->u += weight * (mdx - p->u);
@@ -487,6 +489,27 @@ void ofxMPMFluid::update(float mouseX, float mouseY){
 
             }
         }
+        
+        
+        if (forces->size() > 0)
+        {
+            for (int i=0; i<forces->size(); i++)
+            {
+                ofxMPMForce *f = (*forces)[i];
+                float vx = abs(p->x - f->origin.x*gridSizeX);
+                float vy = abs(p->y - f->origin.y*gridSizeY);
+                float mdx = f->force.x * gridSizeX;
+                float mdy = f->force.y * gridSizeY;
+                if (vx < mouseForce && vy < mouseForce) {
+                    float weight = (1.0F - vx / mouseForce) * (1.0F - vy / mouseForce);
+                    p->u += weight * (mdx - p->u);
+                    p->v += weight * (mdy - p->v);
+                }
+                
+            }
+        }
+        
+        
 		// COLLISIONS-2
 		// Plus, an opportunity to add randomness when accounting for wall collisions. 
 		float xf = p->x + p->u;
@@ -590,7 +613,7 @@ void ofxMPMFluid::draw(){
 	glLineWidth(1.0); // or thicker, if you prefer
 	
 	ofPushMatrix();
-	ofScale(scaleFactor, scaleFactor, 1.0);
+	ofScale(scaleFactor.x, scaleFactor.x, 1.0);
 	
 	// Draw the active particles as a short line, 
 	// using their velocity for their length. 
