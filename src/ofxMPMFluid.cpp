@@ -359,10 +359,11 @@ void ofxMPMFluid::update(float mouseX, float mouseY){
             for (int i=0; i<obstacles.size(); i++)
             {
                 // circular obstacle
-                float oR  = obstacles[i]->radius;
-                float oR2 = obstacles[i]->radius2;
-                float odx = obstacles[i]->cx - p->x;
-                float ody = obstacles[i]->cy - p->y;
+                ofxMPMObstacle* obs = obstacles[i];
+                float oR  = obs->radius;
+                float oR2 = obs->radius2;
+                float odx = obs->cx - p->x;
+                float ody = obs->cy - p->y;
                 float oD2 = odx*odx + ody*ody;
                 if (oD2 < oR2){
                     float oD = sqrtf(oD2);
@@ -688,4 +689,10 @@ void ofxMPMFluid::removeObstacle(ofxMPMObstacle *ob)
         }
     }
 }
+
+vector<ofxMPMObstacle*>& ofxMPMFluid::getObstacles()
+{
+    return obstacles;
+}
+
 

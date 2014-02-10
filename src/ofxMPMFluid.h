@@ -70,6 +70,7 @@ class ofxMPMFluid {
     
     void addObstacle(ofxMPMObstacle *ob);
     void removeObstacle(ofxMPMObstacle *ob);
+    vector<ofxMPMObstacle*>& getObstacles();
 	
 	int getGridSizeX();
 	int getGridSizeY();
